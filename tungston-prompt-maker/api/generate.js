@@ -1,0 +1,77 @@
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ error: 'Method not allowed.' });
+  }
+
+  const key = process.env.GROQ_API_KEY;
+  if (!key) {
+    return res.status(500).json({ error: 'Server is missing GROQ_API_KEY.' });
+  }
+
+  const body = req.body || {};
+  const idea = typeof body.idea === 'string' ? body.idea.trim() : '';
+  const target = ['text', 'code', 'image'].includes(body.target) ? body.target : 'text';
+
+  if (idea.length < 5) {
+    return res.status(400).json({ error: 'Describe your idea in at least a few words.' });
+  }
+  if (idea.length > 4000) {
+    return res.status(400).json({ error: 'Idea is too long. Keep it under 4000 characters.' });
+  }
+
+  const targetNotes = {
+    text: 'The prompt is for a general-purpose text AI model (chat, writing, analysis, research).',
+    code: 'The prompt is for an AI coding assistant. Specify language, inputs, outputs, edge cases, and code-quality expectations.',
+    image: 'The prompt is for an AI image generator. Describe subject, style, composition, lighting, colors, and aspect ratio in concrete visual terms.'
+  };
+
+  const system = [
+    'You turn rough ideas into sharp, structured prompts that another AI model will run.',
+    targetNotes[target],
+    'Write the prompt in the second person addressed to the AI model.',
+    'Use these labeled sections when they apply: ROLE, TASK, CONTEXT, REQUIREMENTS, OUTPUT FORMAT.',
+    'Keep every section concrete. Do not invent facts the user did not give. If a detail is missing, add a short line telling the model to ask or to state its assumption.',
+    'Return only the finished prompt. No preface, no explanation, no markdown code fences.'
+  ].join('\n');
+
+  try {
+    const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.5,
+        max_tokens: 1200,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: idea }
+        ]
+      })
+    });
+
+    if (!upstream.ok) {
+      const status = upstream.status === 429 ? 429 : 502;
+      const message = upstream.status === 429
+        ? 'Rate limit hit. Wait a moment and try again.'
+        : 'The AI provider failed. Try again.';
+      return res.status(status).json({ error: message });
+    }
+
+    const data = await upstream.json();
+    const prompt = data && data.choices && data.choices[0] && data.choices[0].message
+      ? String(data.choices[0].message.content || '').trim()
+      : '';
+
+    if (!prompt) {
+      return res.status(502).json({ error: 'The AI returned an empty response. Try again.' });
+    }
+
+    return res.status(200).json({ prompt });
+  } catch (err) {
+    return res.status(500).json({ error: 'Request failed. Try again.' });
+  }
+};
