@@ -9,73 +9,331 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--concrete:#24272b;--paper:#2e3237;--ink:#f2efe6;--amber:#ffb800;--gun:#3a3f45;}
-[data-theme="light"]{--concrete:#b9b9b4;--paper:#dcdcd6;--ink:#0a0a0a;--amber:#ffb000;--gun:#26272a;}
-*{box-sizing:border-box;margin:0;padding:0;border-radius:0}
-body{background:var(--concrete);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:15px;line-height:1.55;min-height:100vh}
-a{color:inherit}
-.bar{display:flex;align-items:stretch;justify-content:space-between;border-bottom:4px solid var(--ink);background:var(--paper)}
-.brand{display:flex;align-items:center;gap:14px;padding:10px 18px;text-decoration:none}
-.el{border:3px solid var(--ink);background:var(--amber);padding:2px 8px;line-height:1.1;text-align:center}
-.el b{display:block;font-family:'Archivo Black',sans-serif;font-size:22px}
-.el i{display:block;font-style:normal;font-size:11px;font-weight:700}
-.brand span{font-family:'Archivo Black',sans-serif;font-size:22px;letter-spacing:1px}
-.back{display:flex;align-items:center;padding:0 20px;font-weight:700;text-decoration:none;background:var(--ink);color:var(--amber)}
-.back:hover{background:var(--amber);color:var(--ink)}
-main{max-width:980px;margin:0 auto;padding:40px 18px 60px}
-.tag{display:inline-block;background:var(--ink);color:var(--amber);padding:3px 10px;font-weight:700;font-size:13px;letter-spacing:1px;margin-bottom:14px}
-h1{font-family:'Archivo Black',sans-serif;font-size:clamp(40px,9vw,84px);line-height:.95;text-transform:uppercase;margin-bottom:16px}
-.lead{max-width:620px;margin-bottom:34px;font-weight:500}
-.panel{background:var(--paper);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);margin-bottom:34px}
-.ph{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--paper);padding:8px 16px;font-weight:700;font-size:13px;letter-spacing:1px}
-.ph em{font-style:normal;color:var(--amber)}
-.pb{padding:20px}
-label{display:block;font-weight:700;font-size:13px;letter-spacing:1px;margin-bottom:8px}
-textarea{width:100%;min-height:180px;resize:vertical;background:#fff;border:4px solid var(--ink);padding:14px;font-family:inherit;font-size:15px;color:var(--ink);outline:none}
-textarea:focus{box-shadow:6px 6px 0 var(--amber)}
-.row{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px;align-items:flex-end}
-.seg{display:flex;border:4px solid var(--ink);background:#fff}
-.seg input{position:absolute;opacity:0;pointer-events:none}
-.seg label{margin:0;padding:10px 18px;cursor:pointer;border-right:4px solid var(--ink);letter-spacing:0}
-.seg label:last-of-type{border-right:0}
-.seg input:checked+label{background:var(--amber)}
-.seg input:focus-visible+label{outline:3px solid var(--ink);outline-offset:-6px}
-.count{margin-left:auto;font-size:13px;font-weight:700}
-button{font-family:'Archivo Black',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:1px;background:var(--ink);color:var(--amber);border:4px solid var(--ink);padding:14px 26px;cursor:pointer;box-shadow:6px 6px 0 var(--amber)}
-button:hover:not(:disabled){background:var(--amber);color:var(--ink);box-shadow:6px 6px 0 var(--ink)}
-button:active:not(:disabled){transform:translate(6px,6px);box-shadow:0 0 0 var(--ink)}
-button:disabled{background:var(--gun);color:#888;box-shadow:6px 6px 0 #777;cursor:not-allowed}
-.go{margin-top:24px}
-.err{display:none;margin-top:20px;border:4px solid var(--ink);background:#ff4d2e;padding:12px 16px;font-weight:700}
-.err.on{display:block}
-#out{display:none}
-#out.on{display:block}
-pre{white-space:pre-wrap;word-wrap:break-word;background:var(--gun);color:#f2f2ee;padding:20px;font-family:inherit;font-size:14px;border:4px solid var(--ink);min-height:120px}
-.copy{margin-top:20px;font-size:15px;padding:10px 20px;background:var(--amber);color:var(--ink);box-shadow:5px 5px 0 var(--ink)}
-.copy:hover:not(:disabled){background:var(--ink);color:var(--amber);box-shadow:5px 5px 0 var(--amber)}
-footer{border-top:4px solid var(--ink);background:var(--ink);color:var(--paper);padding:16px 18px;text-align:center;font-weight:700;font-size:13px;letter-spacing:1px}
-@media(max-width:560px){.count{margin-left:0;width:100%}.seg label{padding:10px 12px}.panel{box-shadow:6px 6px 0 var(--ink)}}
-.history-item { border: 4px solid var(--ink); padding: 14px; margin-bottom: 14px; background: var(--gun); color: var(--ink); position: relative; }
-.history-item pre { min-height: auto; padding: 10px; margin-top: 10px; border: 2px solid var(--ink); }
-.delete-btn { position: absolute; top: 10px; right: 10px; background: var(--amber); color: var(--ink); border: 2px solid var(--ink); cursor: pointer; font-family: 'Archivo Black', sans-serif; font-size: 12px; padding: 4px 8px; text-transform: uppercase; }
-.delete-btn:hover { background: var(--ink); color: var(--amber); }
-@media(max-width:560px){
-  .bar { flex-direction: column; align-items: center; }
-  .back-group { width: 100%; justify-content: center; border-left: none; border-top: 4px solid var(--ink); }
-  .back-group .back { flex: 1; text-align: center; justify-content: center; padding: 10px; border-left: none; }
-  .back-group #theme-toggle { border-right: 4px solid var(--ink); }
+:root {
+  --base: #18191B;
+  --surface: #24272B;
+  --surface2: #2E3237;
+  --input-bg: #111214;
+  --ink: #F2EFE6;
+  --line: #0B0C0D;
+  --amber: #FFB800;
+  --amber-text: #0B0C0D;
+  --muted: #8E9197;
+  --warn: #FF3B30;
+  --shadow: 4px 4px 0 #000000;
+  --shadow-lg: 8px 8px 0 #000000;
+}
+
+[data-theme="light"] {
+  --base: #EEEEE6;
+  --surface: #E4E0D5;
+  --surface2: #D6D1C4;
+  --input-bg: #FFFFFF;
+  --ink: #0B0C0D;
+  --line: #0B0C0D;
+  --amber: #FFB800;
+  --amber-text: #0B0C0D;
+  --muted: #6B6B63;
+  --warn: #FF3B30;
+  --shadow: 4px 4px 0 #0B0C0D;
+  --shadow-lg: 8px 8px 0 #0B0C0D;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0; }
+body {
+  background: var(--base);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100vh;
+  position: relative;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  z-index: 999;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a { color: inherit; text-decoration: none; }
+
+.bar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--line);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+}
+
+.el {
+  border: 3px solid var(--line);
+  background: var(--amber);
+  color: var(--amber-text);
+  padding: 2px 8px;
+  line-height: 1.1;
+  text-align: center;
+  box-shadow: 2px 2px 0 var(--line);
+}
+.el b { display: block; font-family: 'Archivo Black', sans-serif; font-size: 20px; }
+.el i { display: block; font-style: normal; font-size: 10px; font-weight: 700; }
+.brand span { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: 1px; }
+
+.nav-actions {
+  display: flex;
+  align-items: stretch;
+  border-left: 3px solid var(--line);
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--surface2);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  border-left: 3px solid var(--line);
+  transition: all 0.1s ease;
+}
+.nav-btn:first-child { border-left: none; }
+.nav-btn:hover { background: var(--amber); color: var(--amber-text); }
+
+main { max-width: 980px; margin: 0 auto; padding: 40px 18px 60px; }
+.tag {
+  display: inline-block;
+  background: var(--surface2);
+  color: var(--amber);
+  border: 2px solid var(--line);
+  padding: 3px 10px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+h1 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(36px, 8vw, 76px);
+  line-height: .95;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.lead { max-width: 620px; margin-bottom: 34px; font-weight: 500; color: var(--ink); }
+
+.panel {
+  background: var(--surface);
+  border: 3px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 34px;
+}
+.ph {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface2);
+  color: var(--ink);
+  border-bottom: 3px solid var(--line);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.ph em { font-style: normal; color: var(--amber); }
+.pb { padding: 22px; }
+
+label { display: block; font-weight: 700; font-size: 13px; letter-spacing: 1px; margin-bottom: 10px; }
+textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  background: var(--input-bg);
+  border: 3px solid var(--line);
+  padding: 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea:focus { border-color: var(--amber); box-shadow: 3px 3px 0 var(--amber); }
+
+.row { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; align-items: flex-end; }
+.seg { display: flex; border: 3px solid var(--line); background: var(--input-bg); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label {
+  margin: 0;
+  padding: 10px 18px;
+  cursor: pointer;
+  border-right: 3px solid var(--line);
+  letter-spacing: 0;
+  font-weight: 700;
+  color: var(--ink);
+  transition: background 0.1s;
+}
+.seg label:last-of-type { border-right: 0; }
+.seg input:checked+label { background: var(--amber); color: var(--amber-text); }
+.seg input:focus-visible+label { outline: 2px solid var(--amber); outline-offset: -4px; }
+
+.count { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--muted); }
+
+button.go {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--amber);
+  color: var(--amber-text);
+  border: 3px solid var(--line);
+  padding: 14px 26px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  margin-top: 24px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+button.go:hover:not(:disabled) { box-shadow: 2px 2px 0 var(--line); transform: translate(2px, 2px); }
+button.go:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--line); }
+button.go:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; box-shadow: none; opacity: 0.6; }
+
+.err {
+  display: none;
+  margin-top: 20px;
+  border: 3px solid var(--line);
+  background: var(--warn);
+  color: #fff;
+  padding: 12px 16px;
+  font-weight: 700;
+}
+.err.on { display: block; }
+
+#out { display: none; }
+#out.on { display: block; }
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background: var(--input-bg);
+  color: var(--ink);
+  padding: 20px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  border: 3px solid var(--line);
+  min-height: 120px;
+}
+.copy {
+  margin-top: 20px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 22px;
+  background: var(--amber);
+  color: var(--amber-text);
+  border: 3px solid var(--line);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.copy:hover:not(:disabled) { box-shadow: 2px 2px 0 var(--line); transform: translate(2px, 2px); }
+.copy:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: none; }
+
+.history-item {
+  border: 3px solid var(--line);
+  padding: 16px;
+  margin-bottom: 14px;
+  background: var(--surface2);
+  color: var(--ink);
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.history-item strong { color: var(--amber); display: block; margin-bottom: 6px; font-size: 13px; text-transform: uppercase; }
+.history-item pre {
+  min-height: auto;
+  padding: 12px;
+  margin-top: 8px;
+  border: 2px solid var(--line);
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.history-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+.hist-btn {
+  background: var(--surface);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 5px 12px;
+  text-transform: uppercase;
+  transition: all 0.1s;
+}
+.hist-btn:hover { background: var(--amber); color: var(--amber-text); }
+.hist-btn.del { background: var(--warn); color: #fff; }
+.hist-btn.del:hover { background: #d32f2f; }
+
+#clear-history {
+  background: var(--surface2);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  padding: 8px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.1s;
+}
+#clear-history:hover { background: var(--warn); color: #fff; }
+
+footer {
+  border-top: 3px solid var(--line);
+  background: var(--surface2);
+  color: var(--muted);
+  padding: 18px 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+@media(max-width: 600px) {
+  .bar { flex-direction: column; }
+  .nav-actions { width: 100%; border-left: none; border-top: 3px solid var(--line); }
+  .nav-btn { flex: 1; padding: 12px; text-align: center; }
+  .count { margin-left: 0; width: 100%; }
+  .seg label { padding: 10px 12px; }
+  .panel { box-shadow: var(--shadow); }
 }
 </style>
 </head>
 <body>
+<div class="grain"></div>
 <header class="bar">
-  <a class="brand" href="https://tungston-hazel.vercel.app/">
+  <a class="brand" href="https://tungston-ai.vercel.app/">
     <div class="el"><i>74</i><b>W</b></div>
     <span>TUNGSTON</span>
   </a>
-  <div class="back-group" style="display: flex; border-left: 4px solid var(--ink);">
-    <button id="theme-toggle" class="back" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit; border-left:none;">☀️ LIGHT</button>
-    <a class="back" href="https://tungston-hazel.vercel.app/" style="border-left: 4px solid var(--ink);">← ALL TOOLS</a>
+  <div class="nav-actions">
+    <button id="theme-toggle" class="nav-btn" type="button" aria-label="Toggle theme">☀️ LIGHT</button>
+    <a class="nav-btn" href="https://tungston-ai.vercel.app/">← ALL TOOLS</a>
   </div>
 </header>
 <main>
@@ -99,7 +357,7 @@ footer{border-top:4px solid var(--ink);background:var(--ink);color:var(--paper);
         </div>
         <div class="count"><span id="count">0</span> / 4000</div>
       </div>
-      <button class="go" id="go" type="button">Forge Prompt</button>
+      <button class="go" id="go" type="button">Forge Prompt ↗</button>
       <div class="err" id="err" role="alert"></div>
     </div>
   </section>
@@ -111,126 +369,177 @@ footer{border-top:4px solid var(--ink);background:var(--ink);color:var(--paper);
       <button class="copy" id="copy" type="button">Copy Prompt</button>
     </div>
   </section>
+
   <section class="panel" id="history-panel">
     <div class="ph"><span>HISTORY</span><em>RECENT PROMPTS</em></div>
-    <div class="pb" id="history-list">
-    </div>
-    <div class="pb" style="padding-top: 0;">
-      <button class="go" id="clear-history" style="font-size: 14px; padding: 8px 16px; margin-top: 0;">Clear History</button>
+    <div class="pb" id="history-list"></div>
+    <div class="pb" style="padding-top: 0; display: flex; justify-content: flex-end;">
+      <button id="clear-history" type="button">Clear All History</button>
     </div>
   </section>
 </main>
 <footer>TUNGSTON — built raw, shipped straight.</footer>
+
 <script>
-var idea=document.getElementById('idea');
-var go=document.getElementById('go');
-var err=document.getElementById('err');
-var out=document.getElementById('out');
-var result=document.getElementById('result');
-var copy=document.getElementById('copy');
-var count=document.getElementById('count');
+var idea = document.getElementById('idea');
+var go = document.getElementById('go');
+var err = document.getElementById('err');
+var out = document.getElementById('out');
+var result = document.getElementById('result');
+var copy = document.getElementById('copy');
+var count = document.getElementById('count');
+var themeToggle = document.getElementById('theme-toggle');
 
-idea.addEventListener('input',function(){count.textContent=idea.value.length});
+// Character counter
+idea.addEventListener('input', function() { count.textContent = idea.value.length; });
 
-function showError(msg){err.textContent=msg;err.classList.add('on')}
+function showError(msg) { err.textContent = msg; err.classList.add('on'); }
 
-go.addEventListener('click',async function(){
-  err.classList.remove('on');
-  var text=idea.value.trim();
-  if(text.length<5){showError('Describe your idea in at least a few words.');return}
-  var target=document.querySelector('input[name="target"]:checked').value;
-  go.disabled=true;
-  go.textContent='Forging...';
-  try{
-    var r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idea:text,target:target})});
-    var d=await r.json();
-    if(!r.ok){showError(d.error||'Something failed. Try again.');return}
-    result.textContent=d.prompt;
-    saveToHistory(text, d.prompt);
-    out.classList.add('on');
-    copy.textContent='Copy Prompt';
-    out.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){
-    showError('Network error. Check your connection and try again.');
-  }finally{
-    go.disabled=false;
-    go.textContent='Forge Prompt';
-  }
-});
-
-copy.addEventListener('click',async function(){
-  try{
-    await navigator.clipboard.writeText(result.textContent);
-    copy.textContent='Copied';
-  }catch(e){
-    var range=document.createRange();
-    range.selectNodeContents(result);
-    var sel=window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    copy.textContent='Selected — press Ctrl+C';
-  }
-});
-
-
-const themeToggle = document.getElementById('theme-toggle');
-themeToggle.addEventListener('click', () => {
-  if (document.documentElement.getAttribute('data-theme') === 'light') {
+// Theme handling: Dark is default
+function initTheme() {
+  var saved = localStorage.getItem('tungston_theme') || 'dark';
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeToggle.textContent = '🌙 DARK';
+  } else {
     document.documentElement.removeAttribute('data-theme');
+    themeToggle.textContent = '☀️ LIGHT';
+  }
+}
+
+themeToggle.addEventListener('click', function() {
+  var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if (isLight) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('tungston_theme', 'dark');
     themeToggle.textContent = '☀️ LIGHT';
   } else {
     document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('tungston_theme', 'light');
     themeToggle.textContent = '🌙 DARK';
   }
 });
 
+initTheme();
+
+// Prompt generation
+go.addEventListener('click', async function() {
+  err.classList.remove('on');
+  var text = idea.value.trim();
+  if (text.length < 5) { showError('Describe your idea in at least a few words.'); return; }
+  var target = document.querySelector('input[name="target"]:checked').value;
+  go.disabled = true;
+  go.textContent = 'FORGING...';
+  try {
+    var r = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idea: text, target: target })
+    });
+    var d = await r.json();
+    if (!r.ok) { showError(d.error || 'Something failed. Try again.'); return; }
+    result.textContent = d.prompt;
+    saveToHistory(text, d.prompt, target);
+    out.classList.add('on');
+    copy.textContent = 'Copy Prompt';
+    out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(e) {
+    showError('Network error. Check your connection and try again.');
+  } finally {
+    go.disabled = false;
+    go.textContent = 'Forge Prompt ↗';
+  }
+});
+
+// Copy to clipboard
+copy.addEventListener('click', async function() {
+  try {
+    await navigator.clipboard.writeText(result.textContent);
+    copy.textContent = 'Copied!';
+    setTimeout(function() { copy.textContent = 'Copy Prompt'; }, 2000);
+  } catch(e) {
+    var range = document.createRange();
+    range.selectNodeContents(result);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    copy.textContent = 'Selected — press Ctrl+C';
+  }
+});
+
+// History Handling (localStorage)
+function escapeHtml(str) {
+  var d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
 function loadHistory() {
-  const history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
-  const list = document.getElementById('history-list');
+  var history = JSON.parse(localStorage.getItem('tungston_pm_history') || '[]');
+  var list = document.getElementById('history-list');
   list.innerHTML = '';
   if (history.length === 0) {
-    list.innerHTML = '<p style="font-weight:500;">No history yet.</p>';
+    list.innerHTML = '<p style="color:var(--muted); font-size:13px;">No past prompts recorded yet.</p>';
     return;
   }
-  history.forEach((item, index) => {
-    const div = document.createElement('div');
+  history.forEach(function(item, index) {
+    var div = document.createElement('div');
     div.className = 'history-item';
-    div.innerHTML = `
-      <strong>Idea:</strong> ${item.idea.substring(0, 80)}${item.idea.length > 80 ? '...' : ''}
-      <pre>${item.prompt.replace(/</g, "&lt;")}</pre>
-      <button class="delete-btn" data-index="${index}">X</button>
-    `;
+    div.innerHTML = 
+      '<strong>' + escapeHtml(item.target ? item.target.toUpperCase() + ' PROMPT: ' : 'PROMPT: ') + escapeHtml(item.idea.substring(0, 90)) + (item.idea.length > 90 ? '...' : '') + '</strong>' +
+      '<pre>' + escapeHtml(item.prompt) + '</pre>' +
+      '<div class="history-actions">' +
+        '<button class="hist-btn copy-hist" data-index="' + index + '">Copy</button>' +
+        '<button class="hist-btn del del-hist" data-index="' + index + '">Delete</button>' +
+      '</div>';
     list.appendChild(div);
   });
 
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      deleteHistory(e.target.getAttribute('data-index'));
+  // Attach handlers
+  document.querySelectorAll('.copy-hist').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var idx = parseInt(e.target.getAttribute('data-index'), 10);
+      var item = history[idx];
+      if (item && item.prompt) {
+        navigator.clipboard.writeText(item.prompt).then(function() {
+          e.target.textContent = 'Copied!';
+          setTimeout(function() { e.target.textContent = 'Copy'; }, 1500);
+        });
+      }
+    });
+  });
+
+  document.querySelectorAll('.del-hist').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var idx = parseInt(e.target.getAttribute('data-index'), 10);
+      deleteHistory(idx);
     });
   });
 }
 
-function saveToHistory(idea, prompt) {
-  const history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
-  history.unshift({ idea, prompt, date: new Date().toISOString() });
-  localStorage.setItem('promptHistory', JSON.stringify(history));
+function saveToHistory(idea, prompt, target) {
+  var history = JSON.parse(localStorage.getItem('tungston_pm_history') || '[]');
+  history.unshift({ idea: idea, prompt: prompt, target: target, date: new Date().toISOString() });
+  if (history.length > 30) history = history.slice(0, 30);
+  localStorage.setItem('tungston_pm_history', JSON.stringify(history));
   loadHistory();
 }
 
 function deleteHistory(index) {
-  const history = JSON.parse(localStorage.getItem('promptHistory') || '[]');
+  var history = JSON.parse(localStorage.getItem('tungston_pm_history') || '[]');
   history.splice(index, 1);
-  localStorage.setItem('promptHistory', JSON.stringify(history));
+  localStorage.setItem('tungston_pm_history', JSON.stringify(history));
   loadHistory();
 }
 
-document.getElementById('clear-history').addEventListener('click', () => {
-  localStorage.removeItem('promptHistory');
-  loadHistory();
+document.getElementById('clear-history').addEventListener('click', function() {
+  if (confirm('Delete all past saved prompts?')) {
+    localStorage.removeItem('tungston_pm_history');
+    loadHistory();
+  }
 });
 
 loadHistory();
-
 </script>
 </body>
 </html>
