@@ -1,12 +1,50 @@
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 15;
+const hits = new Map();
+
+function clientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  return (fwd ? String(fwd).split(',')[0].trim() : req.socket?.remoteAddress) || 'unknown';
+}
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const arr = (hits.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (arr.length >= RATE_LIMIT_MAX) {
+    hits.set(ip, arr);
+    return false;
+  }
+  arr.push(now);
+  hits.set(ip, arr);
+  if (hits.size > 2000) {
+    for (const [k, v] of hits.entries()) {
+      const filtered = v.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+      if (filtered.length) hits.set(k, filtered);
+      else hits.delete(k);
+    }
+  }
+  return true;
+}
+
 module.exports = async function handler(req, res) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
+  const ip = clientIp(req);
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ error: 'Too many requests. Please wait a minute and try again.' });
+  }
+
   const key = process.env.GROQ_API_KEY;
   if (!key) {
-    return res.status(500).json({ error: 'Server is missing GROQ_API_KEY.' });
+    return res.status(500).json({ error: 'Server configuration error: GROQ_API_KEY is missing.' });
   }
 
   const body = req.body || {};
@@ -35,6 +73,9 @@ module.exports = async function handler(req, res) {
     'Return only the finished prompt. No preface, no explanation, no markdown code fences.'
   ].join('\n');
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
   try {
     const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -43,29 +84,29 @@ module.exports = async function handler(req, res) {
         Authorization: 'Bearer ' + key
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-120b',
-        reasoning_effort: 'low',
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.5,
         max_tokens: 2500,
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: idea }
         ]
-      })
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
 
     if (!upstream.ok) {
       const status = upstream.status === 429 ? 429 : 502;
       const message = upstream.status === 429
         ? 'Rate limit hit. Wait a moment and try again.'
-        : 'The AI provider failed. Try again.';
+        : 'Upstream AI provider error (' + upstream.status + '). Try again shortly.';
       return res.status(status).json({ error: message });
     }
 
     const data = await upstream.json();
-    const prompt = data && data.choices && data.choices[0] && data.choices[0].message
-      ? String(data.choices[0].message.content || '').trim()
-      : '';
+    const prompt = data?.choices?.[0]?.message?.content?.trim();
 
     if (!prompt) {
       return res.status(502).json({ error: 'The AI returned an empty response. Try again.' });
@@ -73,6 +114,10 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ prompt });
   } catch (err) {
-    return res.status(500).json({ error: 'Request failed. Try again.' });
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      return res.status(504).json({ error: 'Request timed out waiting for AI response.' });
+    }
+    return res.status(500).json({ error: 'Request failed. Please try again.' });
   }
 };
