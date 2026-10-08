@@ -108,14 +108,20 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface2);
   color: var(--ink);
   border: none;
-  cursor: pointer;
   border-left: 3px solid var(--line);
-  transition: all 0.1s ease;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-transform: uppercase;
 }
-.nav-btn:first-child { border-left: none; }
+.nav-actions .nav-btn:first-child { border-left: none; }
 .nav-btn:hover { background: var(--amber); color: var(--amber-text); }
 
-main { max-width: 980px; margin: 0 auto; padding: 40px 18px 60px; }
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
 .tag {
   display: inline-block;
   background: var(--surface2);
@@ -135,7 +141,20 @@ h1 {
   margin-bottom: 16px;
   letter-spacing: -0.02em;
 }
-.lead { max-width: 620px; margin-bottom: 34px; font-weight: 500; color: var(--ink); }
+.lead { max-width: 620px; margin-bottom: 24px; font-weight: 500; color: var(--ink); }
+
+.engine-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 3px solid var(--line);
+  background: var(--surface2);
+  padding: 10px 16px;
+  margin-bottom: 28px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.engine-status-bar span { color: var(--amber); }
 
 .panel {
   background: var(--surface);
@@ -181,72 +200,89 @@ textarea:focus { border-color: var(--amber); box-shadow: 3px 3px 0 var(--amber);
   margin: 0;
   padding: 10px 18px;
   cursor: pointer;
-  border-right: 3px solid var(--line);
-  letter-spacing: 0;
   font-weight: 700;
-  color: var(--ink);
-  transition: background 0.1s;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
 }
-.seg label:last-of-type { border-right: 0; }
-.seg input:checked+label { background: var(--amber); color: var(--amber-text); }
-.seg input:focus-visible+label { outline: 2px solid var(--amber); outline-offset: -4px; }
+.seg input:checked + label {
+  background: var(--amber);
+  color: var(--amber-text);
+}
+.count { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 700; }
 
-.count { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--muted); }
-
-button.go {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 16px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.go {
+  margin-top: 24px;
   background: var(--amber);
   color: var(--amber-text);
   border: 3px solid var(--line);
-  padding: 14px 26px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 16px;
+  padding: 14px 28px;
   cursor: pointer;
+  text-transform: uppercase;
   box-shadow: var(--shadow);
-  margin-top: 24px;
   transition: transform 0.1s, box-shadow 0.1s;
 }
-button.go:hover:not(:disabled) { box-shadow: 2px 2px 0 var(--line); transform: translate(2px, 2px); }
-button.go:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--line); }
-button.go:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; box-shadow: none; opacity: 0.6; }
+.go:hover:not(:disabled) { box-shadow: 2px 2px 0 var(--line); transform: translate(2px, 2px); }
+.go:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: none; }
+.go:disabled { opacity: 0.6; cursor: wait; }
 
 .err {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: #3b1111;
+  color: #ff9999;
+  border: 2px solid var(--warn);
+  font-size: 13px;
   display: none;
-  margin-top: 20px;
-  border: 3px solid var(--line);
-  background: var(--warn);
-  color: #fff;
-  padding: 12px 16px;
-  font-weight: 700;
 }
 .err.on { display: block; }
+
+.quota-box {
+  margin-top: 18px;
+  padding: 16px;
+  background: var(--surface2);
+  border: 3px solid var(--warn);
+  display: none;
+}
+.quota-box.on { display: block; }
+.quota-box h3 { color: var(--warn); font-family: 'Archivo Black', sans-serif; font-size: 16px; margin-bottom: 6px; }
+.quota-box p { font-size: 13px; margin-bottom: 12px; }
+.quota-box .byok-trigger-btn {
+  background: var(--amber);
+  color: var(--amber-text);
+  border: 2px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
 
 #out { display: none; }
 #out.on { display: block; }
 pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
   background: var(--input-bg);
-  color: var(--ink);
-  padding: 20px;
+  border: 3px solid var(--line);
+  padding: 18px;
   font-family: inherit;
   font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
   line-height: 1.6;
-  border: 3px solid var(--line);
   min-height: 120px;
 }
 .copy {
-  margin-top: 20px;
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 12px 22px;
-  background: var(--amber);
-  color: var(--amber-text);
+  margin-top: 14px;
+  background: var(--surface2);
+  color: var(--ink);
   border: 3px solid var(--line);
-  box-shadow: var(--shadow);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 20px;
+  text-transform: uppercase;
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
 }
@@ -303,6 +339,38 @@ pre {
 }
 #clear-history:hover { background: var(--warn); color: #fff; }
 
+/* BYOK Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+.modal-overlay.hidden { display: none; }
+.modal-dialog {
+  max-width: 560px;
+  width: 100%;
+  margin: 0;
+}
+.modal-dialog select, .modal-dialog input[type="text"], .modal-dialog input[type="password"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 3px solid var(--line);
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 14px;
+}
+.modal-dialog select:focus, .modal-dialog input:focus {
+  border-color: var(--amber);
+}
+
 footer {
   border-top: 3px solid var(--line);
   background: var(--surface2);
@@ -317,7 +385,7 @@ footer {
 @media(max-width: 600px) {
   .bar { flex-direction: column; }
   .nav-actions { width: 100%; border-left: none; border-top: 3px solid var(--line); }
-  .nav-btn { flex: 1; padding: 12px; text-align: center; }
+  .nav-btn { flex: 1; padding: 12px; text-align: center; font-size: 11px; }
   main { padding: 24px 14px 40px; }
   .count { margin-left: 0; width: 100%; }
   .seg { width: 100%; }
@@ -337,6 +405,7 @@ footer {
     <span>TUNGSTON</span>
   </a>
   <div class="nav-actions">
+    <button id="byok-nav-btn" class="nav-btn" type="button">🔑 BYOK: SERVER (8B)</button>
     <button id="theme-toggle" class="nav-btn" type="button" aria-label="Toggle theme">☀️ LIGHT</button>
     <a class="nav-btn" href="https://tungston-ai.vercel.app/">← ALL TOOLS</a>
   </div>
@@ -344,7 +413,12 @@ footer {
 <main>
   <div class="tag">PM-04</div>
   <h1>Prompt Maker</h1>
-  <p class="lead">Drop in a rough idea. Get back a structured prompt with role, task, context, requirements, and output format — ready to paste into any AI.</p>
+  <p class="lead">Drop in a rough idea. Get back a structured prompt with role, task, context, requirements, and output format — forged for peak LLM performance.</p>
+
+  <div class="engine-status-bar">
+    <div>ENGINE: <span id="current-engine-label">GROQ 8B (META-PROMPTED)</span></div>
+    <div>STATUS: <span id="current-provider-label">READY</span></div>
+  </div>
 
   <section class="panel">
     <div class="ph"><span>INPUT</span><em>ROUGH IDEA</em></div>
@@ -364,6 +438,13 @@ footer {
       </div>
       <button class="go" id="go" type="button">Forge Prompt ↗</button>
       <div class="err" id="err" role="alert"></div>
+
+      <!-- Quota exhaustion banner -->
+      <div class="quota-box" id="quota-box">
+        <h3>SERVER QUOTA EXCEEDED</h3>
+        <p>The public Groq key has reached its rate or token limits. Bring your own compatible API key to continue without queueing.</p>
+        <button type="button" class="byok-trigger-btn" id="quota-byok-btn">Configure BYOK Key ↗</button>
+      </div>
     </div>
   </section>
 
@@ -385,6 +466,39 @@ footer {
 </main>
 <footer>TUNGSTON — built raw, shipped straight.</footer>
 
+<!-- BYOK Modal -->
+<div class="modal-overlay hidden" id="byok-modal">
+  <div class="modal-dialog panel">
+    <div class="ph">
+      <span>BYOK CONFIGURATION</span>
+      <button type="button" id="byok-close" style="background:none; border:none; color:var(--ink); font-weight:bold; cursor:pointer;">✕ CLOSE</button>
+    </div>
+    <div class="pb">
+      <p style="font-size:13px; color:var(--ink); margin-bottom:14px;">
+        By default, Prompt Maker runs on server-hosted <strong>Groq 8B</strong>. If the server quota is exhausted or you want custom models, enter your personal API key below.
+      </p>
+
+      <label for="byok-provider">PROVIDER</label>
+      <select id="byok-provider">
+        <option value="groq">Groq (llama-3.1-8b-instant / custom)</option>
+        <option value="openrouter">OpenRouter (Gemini, Llama, Claude, etc.)</option>
+        <option value="nara">Nara Router (agnes-2.5-flash)</option>
+      </select>
+
+      <label for="byok-key">API KEY</label>
+      <input type="password" id="byok-key" placeholder="gsk_... / sk-or-... / sk-nry-...">
+
+      <label for="byok-model">CUSTOM MODEL (OPTIONAL)</label>
+      <input type="text" id="byok-model" placeholder="Leave empty for provider default">
+
+      <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+        <button type="button" class="go" id="byok-save" style="margin-top:0; flex:1;">Save & Use Key</button>
+        <button type="button" class="nav-btn" id="byok-reset" style="padding:12px 16px; border:3px solid var(--line); background:var(--input-bg);">Use Server Key</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 var idea = document.getElementById('idea');
 var go = document.getElementById('go');
@@ -394,6 +508,20 @@ var result = document.getElementById('result');
 var copy = document.getElementById('copy');
 var count = document.getElementById('count');
 var themeToggle = document.getElementById('theme-toggle');
+var quotaBox = document.getElementById('quota-box');
+
+// BYOK Elements
+var byokModal = document.getElementById('byok-modal');
+var byokNavBtn = document.getElementById('byok-nav-btn');
+var byokClose = document.getElementById('byok-close');
+var byokProvider = document.getElementById('byok-provider');
+var byokKey = document.getElementById('byok-key');
+var byokModel = document.getElementById('byok-model');
+var byokSave = document.getElementById('byok-save');
+var byokReset = document.getElementById('byok-reset');
+var quotaByokBtn = document.getElementById('quota-byok-btn');
+var currentEngineLabel = document.getElementById('current-engine-label');
+var currentProviderLabel = document.getElementById('current-provider-label');
 
 // Character counter
 idea.addEventListener('input', function() { count.textContent = idea.value.length; });
@@ -427,22 +555,99 @@ themeToggle.addEventListener('click', function() {
 
 initTheme();
 
+// BYOK State Management
+function getByok() {
+  try {
+    return JSON.parse(localStorage.getItem('tungston_pm_byok') || '{}');
+  } catch(e) {
+    return {};
+  }
+}
+
+function updateByokUi() {
+  var byok = getByok();
+  if (byok.key && byok.key.trim().length > 0) {
+    byokNavBtn.textContent = '🔑 BYOK: ' + (byok.provider || 'GROQ').toUpperCase();
+    currentEngineLabel.textContent = (byok.provider || 'GROQ').toUpperCase() + (byok.model ? ' (' + byok.model + ')' : ' (CUSTOM KEY)');
+    currentProviderLabel.textContent = 'BYOK ACTIVE';
+    byokProvider.value = byok.provider || 'groq';
+    byokKey.value = byok.key || '';
+    byokModel.value = byok.model || '';
+  } else {
+    byokNavBtn.textContent = '🔑 BYOK: SERVER (8B)';
+    currentEngineLabel.textContent = 'GROQ 8B (META-PROMPTED)';
+    currentProviderLabel.textContent = 'SERVER KEY';
+    byokKey.value = '';
+    byokModel.value = '';
+  }
+}
+
+function openByok() { byokModal.classList.remove('hidden'); }
+function closeByok() { byokModal.classList.add('hidden'); }
+
+byokNavBtn.addEventListener('click', openByok);
+quotaByokBtn.addEventListener('click', openByok);
+byokClose.addEventListener('click', closeByok);
+byokModal.addEventListener('click', function(e) { if (e.target === byokModal) closeByok(); });
+
+byokSave.addEventListener('click', function() {
+  var key = byokKey.value.trim();
+  if (!key) { alert('Please enter a valid API key or click "Use Server Key".'); return; }
+  var obj = {
+    provider: byokProvider.value,
+    key: key,
+    model: byokModel.value.trim()
+  };
+  localStorage.setItem('tungston_pm_byok', JSON.stringify(obj));
+  quotaBox.classList.remove('on');
+  err.classList.remove('on');
+  updateByokUi();
+  closeByok();
+});
+
+byokReset.addEventListener('click', function() {
+  localStorage.removeItem('tungston_pm_byok');
+  updateByokUi();
+  closeByok();
+});
+
+updateByokUi();
+
 // Prompt generation
 go.addEventListener('click', async function() {
   err.classList.remove('on');
+  quotaBox.classList.remove('on');
   var text = idea.value.trim();
   if (text.length < 5) { showError('Describe your idea in at least a few words.'); return; }
   var target = document.querySelector('input[name="target"]:checked').value;
   go.disabled = true;
   go.textContent = 'FORGING...';
+
+  var byok = getByok();
+  var payload = {
+    idea: text,
+    target: target,
+    byok_key: byok.key || '',
+    byok_provider: byok.provider || 'groq',
+    byok_model: byok.model || ''
+  };
+
   try {
     var r = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idea: text, target: target })
+      body: JSON.stringify(payload)
     });
     var d = await r.json();
-    if (!r.ok) { showError(d.error || 'Something failed. Try again.'); return; }
+
+    if (!r.ok) {
+      if (d.quota_exceeded || r.status === 429) {
+        quotaBox.classList.add('on');
+      }
+      showError(d.error || 'Something failed. Try again.');
+      return;
+    }
+
     result.textContent = d.prompt;
     saveToHistory(text, d.prompt, target);
     out.classList.add('on');
@@ -500,7 +705,6 @@ function loadHistory() {
     list.appendChild(div);
   });
 
-  // Attach handlers
   document.querySelectorAll('.copy-hist').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       var idx = parseInt(e.target.getAttribute('data-index'), 10);
