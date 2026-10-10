@@ -405,7 +405,7 @@ footer {
     <span>TUNGSTON</span>
   </a>
   <div class="nav-actions">
-    <button id="byok-nav-btn" class="nav-btn" type="button">🔑 BYOK: SERVER (8B)</button>
+    <button id="byok-nav-btn" class="nav-btn" type="button">🔑 BYOK: SERVER (20B)</button>
     <button id="theme-toggle" class="nav-btn" type="button" aria-label="Toggle theme">☀️ LIGHT</button>
     <a class="nav-btn" href="https://tungston-ai.vercel.app/">← ALL TOOLS</a>
   </div>
@@ -416,7 +416,7 @@ footer {
   <p class="lead">Drop in a rough idea. Get back a structured prompt with role, task, context, requirements, and output format — forged for peak LLM performance.</p>
 
   <div class="engine-status-bar">
-    <div>ENGINE: <span id="current-engine-label">GROQ 8B (META-PROMPTED)</span></div>
+    <div>ENGINE: <span id="current-engine-label">GROQ GPT-OSS 20B (META-PROMPTED)</span></div>
     <div>STATUS: <span id="current-provider-label">READY</span></div>
   </div>
 
@@ -475,12 +475,12 @@ footer {
     </div>
     <div class="pb">
       <p style="font-size:13px; color:var(--ink); margin-bottom:14px;">
-        By default, Prompt Maker runs on server-hosted <strong>Groq 8B</strong>. If the server quota is exhausted or you want custom models, enter your personal API key below.
+        By default, Prompt Maker runs on server-hosted <strong>Groq GPT-OSS 20B</strong>. If the server quota is exhausted or you want custom models, enter your personal API key below.
       </p>
 
       <label for="byok-provider">PROVIDER</label>
       <select id="byok-provider">
-        <option value="groq">Groq (llama-3.1-8b-instant / custom)</option>
+        <option value="groq">Groq (openai/gpt-oss-20b / custom)</option>
         <option value="openrouter">OpenRouter (Gemini, Llama, Claude, etc.)</option>
         <option value="nara">Nara Router (agnes-2.5-flash)</option>
       </select>
@@ -574,8 +574,8 @@ function updateByokUi() {
     byokKey.value = byok.key || '';
     byokModel.value = byok.model || '';
   } else {
-    byokNavBtn.textContent = '🔑 BYOK: SERVER (8B)';
-    currentEngineLabel.textContent = 'GROQ 8B (META-PROMPTED)';
+    byokNavBtn.textContent = '🔑 BYOK: SERVER (20B)';
+    currentEngineLabel.textContent = 'GROQ GPT-OSS 20B (META-PROMPTED)';
     currentProviderLabel.textContent = 'SERVER KEY';
     byokKey.value = '';
     byokModel.value = '';

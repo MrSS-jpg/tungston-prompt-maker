@@ -57,8 +57,22 @@ module.exports = async function handler(req, res) {
 
   let apiKey = byokKey || process.env.GROQ_API_KEY;
   let endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-  let modelsToTry = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
+  let modelsToTry = ['openai/gpt-oss-20b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-120b'];
   let extraHeaders = {};
+
+  const DECOMMISSIONED = [
+    'llama-3.1-8b-instant',
+    'llama3-8b-8192',
+    'llama3-70b-8192',
+    'llama-3.3-70b-versatile',
+    'gemma2-9b-it',
+    'gemma-7b-it',
+    'llama-3.2-1b-preview',
+    'llama-3.2-3b-preview',
+    'llama-3.2-11b-vision-preview',
+    'llama-3.2-90b-vision-preview',
+    'mixtral-8x7b-32768'
+  ];
 
   if (byokKey) {
     if (byokProvider === 'openrouter') {
@@ -71,10 +85,12 @@ module.exports = async function handler(req, res) {
     } else {
       // Groq BYOK
       endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-      if (body.byok_model) modelsToTry = [body.byok_model, ...modelsToTry];
+      if (body.byok_model && !DECOMMISSIONED.includes(body.byok_model)) {
+        modelsToTry = [body.byok_model, ...modelsToTry.filter(m => m !== body.byok_model)];
+      }
     }
-  } else if (process.env.GROQ_MODEL) {
-    modelsToTry = [process.env.GROQ_MODEL, ...modelsToTry];
+  } else if (process.env.GROQ_MODEL && !DECOMMISSIONED.includes(process.env.GROQ_MODEL)) {
+    modelsToTry = [process.env.GROQ_MODEL, ...modelsToTry.filter(m => m !== process.env.GROQ_MODEL)];
   }
 
   if (!apiKey) {
@@ -154,7 +170,9 @@ module.exports = async function handler(req, res) {
           errText.includes('decommissioned') ||
           errText.includes('model_not_found') ||
           errText.includes('does not exist') ||
-          errText.includes('no longer supported')
+          errText.includes('not found') ||
+          errText.includes('no longer supported') ||
+          (errText.includes('model') && (errText.includes('access') || errText.includes('unknown') || errText.includes('invalid')))
         ));
 
       if (isModelError) {
