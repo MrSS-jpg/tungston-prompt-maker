@@ -57,7 +57,7 @@ module.exports = async function handler(req, res) {
 
   let apiKey = byokKey || process.env.GROQ_API_KEY;
   let endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-  let modelsToTry = ['llama-3.3-70b-versatile', 'llama3-8b-8192', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
+  let modelsToTry = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
   let extraHeaders = {};
 
   if (byokKey) {
@@ -146,8 +146,18 @@ module.exports = async function handler(req, res) {
 
       const errText = await upstream.text().catch(() => '');
 
-      // If model not found (404), try next model candidate silently
-      if (upstream.status === 404 || errText.includes('model_not_found') || errText.includes('does not exist')) {
+      // Check if model not found or decommissioned
+      const isModelError =
+        upstream.status === 404 ||
+        (upstream.status === 400 && (
+          errText.includes('model_decommissioned') ||
+          errText.includes('decommissioned') ||
+          errText.includes('model_not_found') ||
+          errText.includes('does not exist') ||
+          errText.includes('no longer supported')
+        ));
+
+      if (isModelError) {
         continue;
       }
 
