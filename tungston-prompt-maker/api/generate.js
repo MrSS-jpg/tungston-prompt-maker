@@ -55,25 +55,26 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Idea is too long. Keep it under 4000 characters.' });
   }
 
-  // Determine provider, endpoint, model, and auth key
   let apiKey = byokKey || process.env.GROQ_API_KEY;
   let endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-  let model = 'llama-3.1-8b-instant';
+  let modelsToTry = ['llama-3.3-70b-versatile', 'llama3-8b-8192', 'llama-3.1-8b-instant', 'gemma2-9b-it'];
   let extraHeaders = {};
 
   if (byokKey) {
     if (byokProvider === 'openrouter') {
       endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-      model = body.byok_model || 'meta-llama/llama-3.1-8b-instruct:free';
+      modelsToTry = [body.byok_model || 'meta-llama/llama-3.1-8b-instruct:free', 'google/gemini-2.0-flash-001'];
       extraHeaders = { 'HTTP-Referer': 'https://tungston-prompt-maker.vercel.app', 'X-Title': 'Tungston Prompt Maker' };
     } else if (byokProvider === 'nara') {
       endpoint = 'https://router.bynara.id/v1/chat/completions';
-      model = body.byok_model || 'agnes-2.5-flash';
+      modelsToTry = [body.byok_model || 'agnes-2.5-flash'];
     } else {
       // Groq BYOK
       endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-      model = body.byok_model || 'llama-3.1-8b-instant';
+      if (body.byok_model) modelsToTry = [body.byok_model, ...modelsToTry];
     }
+  } else if (process.env.GROQ_MODEL) {
+    modelsToTry = [process.env.GROQ_MODEL, ...modelsToTry];
   }
 
   if (!apiKey) {
@@ -89,13 +90,12 @@ module.exports = async function handler(req, res) {
     image: 'TARGET: AI Image Generator (Midjourney, DALL-E, Stable Diffusion). Describe camera, lighting, composition, style, color palette, and textures visually.'
   };
 
-  // High-context meta-prompt engineering instructions specifically optimized for 8B models
   const system = [
     'You are an elite Prompt Architect and Prompt Engineering specialist.',
     'Your mission is to transform a raw, informal user concept into a comprehensive, high-precision, production-grade prompt designed to elicit peak performance from advanced AI models.',
     targetNotes[target],
     '',
-    'CRITICAL GUIDELINES FOR THE 8B ENGINE:',
+    'CRITICAL GUIDELINES FOR THE ENGINE:',
     '1. Break down the user prompt into crystal-clear sections:',
     '   - ## ROLE & PERSONA: Define the exact expertise, tone, and authority level.',
     '   - ## OBJECTIVE: State the primary goal with zero ambiguity.',
@@ -108,33 +108,49 @@ module.exports = async function handler(req, res) {
     '4. OUTPUT ONLY THE CRAFTED PROMPT. Do not include introductory remarks ("Here is your prompt:"), no trailing remarks, and no outer code block fences around the entire prompt.'
   ].join('\n');
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
+  let activeData = null;
+  let activeModel = modelsToTry[0];
+  let lastError = null;
 
-  try {
-    const upstream = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + apiKey,
-        ...extraHeaders
-      },
-      body: JSON.stringify({
-        model: model,
-        temperature: 0.5,
-        max_tokens: 2500,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: idea }
-        ]
-      }),
-      signal: controller.signal
-    });
+  for (const m of modelsToTry) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
 
-    clearTimeout(timeout);
+    try {
+      const upstream = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + apiKey,
+          ...extraHeaders
+        },
+        body: JSON.stringify({
+          model: m,
+          temperature: 0.5,
+          max_tokens: 2500,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: idea }
+          ]
+        }),
+        signal: controller.signal
+      });
 
-    if (!upstream.ok) {
+      clearTimeout(timeout);
+
+      if (upstream.ok) {
+        activeData = await upstream.json();
+        activeModel = m;
+        break;
+      }
+
       const errText = await upstream.text().catch(() => '');
+
+      // If model not found (404), try next model candidate silently
+      if (upstream.status === 404 || errText.includes('model_not_found') || errText.includes('does not exist')) {
+        continue;
+      }
+
       if (upstream.status === 429 || upstream.status === 402 || upstream.status === 401) {
         return res.status(upstream.status).json({
           error: 'Rate limit or quota reached on ' + (byokKey ? byokProvider : 'server Groq') + '. Switch to BYOK or verify your key.',
@@ -143,25 +159,28 @@ module.exports = async function handler(req, res) {
           upstream_msg: errText.slice(0, 300)
         });
       }
-      return res.status(502).json({
-        error: 'Upstream provider error (' + upstream.status + '). Try again shortly or use BYOK.',
-        upstream_msg: errText.slice(0, 300)
-      });
-    }
 
-    const data = await upstream.json();
-    const prompt = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!prompt) {
-      return res.status(502).json({ error: 'The AI returned an empty response. Try again.' });
+      lastError = { status: upstream.status, msg: errText.slice(0, 300) };
+    } catch (err) {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') {
+        return res.status(504).json({ error: 'Request timed out waiting for AI response.' });
+      }
+      lastError = { status: 500, msg: err.message };
     }
-
-    return res.status(200).json({ prompt, model_used: model, provider_used: byokKey ? byokProvider : 'groq-8b' });
-  } catch (err) {
-    clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      return res.status(504).json({ error: 'Request timed out waiting for AI response.' });
-    }
-    return res.status(500).json({ error: 'Request failed. Please try again or provide a custom key.' });
   }
+
+  if (!activeData) {
+    return res.status(lastError?.status || 502).json({
+      error: 'Upstream provider error (' + (lastError?.status || 502) + '). Try again shortly or verify your key.',
+      upstream_msg: lastError?.msg || 'Could not connect to model'
+    });
+  }
+
+  const prompt = activeData?.choices?.[0]?.message?.content?.trim();
+  if (!prompt) {
+    return res.status(502).json({ error: 'The AI returned an empty response. Try again.' });
+  }
+
+  return res.status(200).json({ prompt, model_used: activeModel, provider_used: byokKey ? byokProvider : 'groq' });
 };
